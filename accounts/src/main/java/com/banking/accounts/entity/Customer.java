@@ -12,13 +12,13 @@ import lombok.*;
 public class Customer extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
-    private Long customerID;
-    @Column
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @Column(name = "customer_id")
+    private Long customerId;
+    @Column(name = "name")
     private String name;
-    @Column
+    @Column(name = "email")
     private String email;
-    @Column
+    @Column(name = "mobile_number")
     private String mobileNumber;
 }
