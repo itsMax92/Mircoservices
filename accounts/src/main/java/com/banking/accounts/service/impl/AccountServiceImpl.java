@@ -81,4 +81,36 @@ public class AccountServiceImpl implements AccountService {
         return customerDto;
     }
 
+    @Override
+    public boolean updateAccountDetails(CustomerDto customerDto) {
+        boolean accountUpdated = false;
+        AccountsDto accountsDto = customerDto.getAccountsDto();
+        if (accountsDto != null) {
+            Accounts accounts = accountsRepository.findById(accountsDto.getAccountNumber()).orElseThrow(
+                    () -> new ResourceNotFoundException("Account", "Account Number", accountsDto.getAccountNumber().toString())
+            );
+            AccountMapper.mapToAccounts(accounts, accountsDto);
+            accounts = accountsRepository.save(accounts);
+
+            Long customerID = accounts.getCustomerId();
+            Customer customer = customersRepository.findById(accounts.getCustomerId()).orElseThrow(
+                    () -> new ResourceNotFoundException("Customer", "Customer ID", customerID.toString())
+            );
+            CustomerMapper.mapToCustomer(customer, customerDto);
+            customersRepository.save(customer);
+            accountUpdated = true;
+        }
+        return accountUpdated;
+    }
+
+    @Override
+    public boolean deleteAccount(String mobileNumber) {
+        Customer customer = customersRepository.findByMobileNumber(mobileNumber).orElseThrow(
+                () -> new ResourceNotFoundException("Customer", "Mobile Number", mobileNumber)
+        );
+        accountsRepository.deleteByCustomerId(customer.getCustomerId());
+        customersRepository.deleteById(customer.getCustomerId());
+        return true;
+    }
+
 }
